@@ -12,7 +12,6 @@ const AllChirps: React.FC<AllChirpsProps> = (props) => {
     let r = await fetch("/api/chirps/");
     let allChirpsJson = await r.json();
     setAllChirps(allChirpsJson);
-    console.log(allChirpsJson);
   };
 
   useEffect(() => {
@@ -26,10 +25,11 @@ const AllChirps: React.FC<AllChirpsProps> = (props) => {
         {chirps?.reverse().map(chirp => (
           <div key={"chirp-" + chirp.id} className="col-6">
             <div className="card shadow m-2 p-3">
-              <h3>@{chirp.userid}</h3> 
+              <h3>@{chirp.name}</h3> 
               <p>{chirp.content}</p>
               <div className="d-flex justify-content-between align-items-center">
-                <small><Link to={"/" + chirp.id}>permalink</Link></small>
+                <small>{chirp.location}</small>
+                <small><Link to={"/" + chirp.id}>{chirp._created}</Link></small>
                 <Link to={"/admin/" + chirp.id}><button className="btn btn-primary btn-sm">Admin</button></Link>
               </div>
             </div>

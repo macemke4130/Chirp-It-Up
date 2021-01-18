@@ -1,6 +1,6 @@
 export interface Chirp {
     id: number,
-    userid: string,
+    name: string,
     content: string,
     location: string,
     _created: string
