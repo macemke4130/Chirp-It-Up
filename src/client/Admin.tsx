@@ -93,10 +93,10 @@ const Admin: React.FC<AdminProps> = (props) => {
                     <h1>Admin Panel</h1>
                     <div className="card full-width shadow m-2 p-3">
                         <label className="sr-only">User:</label>
-                        <select id="user-select" onChange={handleUserChange} defaultValue={userId} className="m-3">
+                        <select id="user-select" onChange={handleUserChange} value={userId} className="m-3">
                         <option value="null">- Select User -</option>
                             {allUsers?.map(x => (
-                                    <option key={x.id} value={x.id} selected={x.id === userId}>{x.name}</option>
+                                    <option key={x.id} value={x.id}>{x.name}</option>
                             ))}
                         </select>
                         <div className="p-2"></div>
