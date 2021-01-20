@@ -29,13 +29,13 @@ const SingleChirp: React.FC<SingleChirpProps> = (props) => {
                         <div className="d-flex justify-content-between align-items-center">
                             <small>{chirp?.location}</small>
                             <small>{chirp?._created}</small>
-                            <Link to={"/"}><button className="btn btn-primary btn-sm">Home</button></Link>
                         </div>
                     </div>
+                    <Link to={"/"}><button className="btn btn-primary btn-sm">Home</button></Link>
                 </div>
             </div>
         </>
     );
 };
 
-export default SingleChirp;  
+export default SingleChirp;
