@@ -3,6 +3,12 @@ export interface Chirp {
     userid?: number,
     name?: string,
     content: string,
-    location: string,
+    location?: string,
     _created?: string
+};
+
+export interface MB {
+    close: boolean,
+    home: boolean,
+    destroy?: boolean
 };

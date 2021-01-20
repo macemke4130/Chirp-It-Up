@@ -1,73 +1,35 @@
 import * as React from "react";
 import { Link } from 'react-router-dom';
+import { MB } from "./utils/types";
 
 export interface ModalProps {
-    type: string,
-    function?: VoidFunction,
-    user: string,
-    msg: string
+    display: boolean,
+    displayFunction?: VoidFunction,
+    destroyFunction?: VoidFunction,
+    btns?: MB,
+    user?: string,
+    msg?: string
 };
 
 const Modal: React.FC<ModalProps> = (props) => {
-    switch (props.type) {
-        case "edit":
+    switch (props.display) {
+        case true:
             return (
                 <>
                     <div className="modal-container">
                         <div className="my-pop-up">
-                            <h2>Chirp has been updated</h2>
-                            <h4 className="mt-2">@{props.user}</h4>
-                            <p className="mb-4">{props.msg}</p>
-                            <Link to={"/"}><button className="btn btn-primary">Return Home</button></Link>
-                        </div>
-                    </div>
-                </>
-            );
-            break;
-        case "destroy":
-            return (
-                <>
-                    <div className="modal-container">
-                        <div className="my-pop-up">
-                            <h2>Are you sure you want to delete this Chirp?</h2>
-                                <h4 className="mt-2">@{props.user}</h4>
-                                <p className="mb-4">{props.msg}</p>
-                            <div className="d-flex justify-content-between width-50">
-                                <Link to={"/"}><button className="btn btn-primary">Cancel</button></Link>
-                                <button className="btn btn-danger" onClick={props.function}>Delete</button>
+                            <h3>{props.children}</h3>
+                            <div className="d-flex justify-content-around full-width">
+                                {props.btns.close ? <button className="btn btn-primary" onClick={props.displayFunction}>Fine...</button> : ""}
+                                {props.btns.home ? <Link to={"/"}><button className="btn btn-info">Return Home</button></Link> : ""}
+                                {props.btns.destroy ? <button className="btn btn-danger" onClick={props.destroyFunction}>Delete</button> : ""}
                             </div>
                         </div>
                     </div>
                 </>
             );
             break;
-        case "destroyed":
-            return (
-                <>
-                    <div className="modal-container">
-                        <div className="my-pop-up">
-                            <h2>Chirp Deleted</h2>
-                            <Link to={"/"}><button className="btn btn-primary">Return Home</button></Link>
-                        </div>
-                    </div>
-                </>
-            );
-            break;
-        case "new":
-            return (
-                <>
-                    <div className="modal-container">
-                        <div className="my-pop-up">
-                            <h2>New Chirp Posted!</h2>
-                            <h3 className="mt-2">@{props.user}</h3>
-                            <p className="mb-4">{props.msg}</p>
-                            <Link to={"/"}><button className="btn btn-primary">Return Home</button></Link>
-                        </div>
-                    </div>
-                </>
-            );
-            break;
-        case "none":
+        case false:
             return (<> </>);
             break;
     }

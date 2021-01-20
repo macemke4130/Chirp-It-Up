@@ -3,14 +3,10 @@ import db from "./db";
 
 const router = express.Router();
 
-router.get('/api/hello', (req, res, next) => {
-    res.json('World');
-});
-
 router.get('/api/chirps', async (req, res) => {
     try {
         res.json(await db.chirps.all());
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         res.sendStatus(500);
     }
@@ -19,7 +15,7 @@ router.get('/api/chirps', async (req, res) => {
 router.get('/api/users', async (req, res) => {
     try {
         res.json(await db.chirps.users());
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         res.sendStatus(500);
     }
@@ -29,7 +25,27 @@ router.get('/api/chirps/:id', async (req, res) => {
     let id: number = Number(req.params.id);
     try {
         res.json((await db.chirps.single(id))[0]);
-    } catch(e) {
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+router.get('/api/chirps/permalink/:id', async (req, res) => {
+    let id: number = Number(req.params.id);
+    try {
+        res.json((await db.chirps.permalink(id))[0]);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+router.delete('/api/chirps/:id', async (req, res) => {
+    let id: number = Number(req.params.id);
+    try {
+        res.json(await db.chirps.destroy(id));
+    } catch (e) {
         console.log(e);
         res.sendStatus(500);
     }
@@ -41,7 +57,21 @@ router.post('/api/chirps/new', async (req, res) => {
         let content = req.body.content;
         let location = req.body.location;
         res.json(await db.chirps.newPost(userid, content, location));
-    } catch(e) {
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+router.put('/api/chirps/:id', (req, res) => {
+    try {
+        let id = Number(req.params.id);
+        let userid = req.body.userid;
+        let content = req.body.content;
+        let location = req.body.location;
+
+        res.json(db.chirps.put(id, userid, content, location));
+    } catch (e) {
         console.log(e);
         res.sendStatus(500);
     }
