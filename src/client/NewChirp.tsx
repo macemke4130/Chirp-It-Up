@@ -10,40 +10,78 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
     const [allUsers, setAllUsers] = useState<Array<any>>([]);
     const [user, setUser] = useState<string | null>(null);
     const [msg, setMsg] = useState<string>("");
-    const [location, setLocation] = useState<string>("");
+    const [location, setLocation] = useState<string>("Testing");
     const [modalDisplay, setModalDisplay] = useState<boolean>(false);
     const [modalMessage, setModalMessage] = useState<string>("");
-    const [modalBtns, setModalBtns] = useState<MB>({close: true, home: false});
+    const [modalBtns, setModalBtns] = useState<MB>({ close: true, home: false });
+
+    let mention: M = {
+        name: undefined,
+        userId: undefined
+    };
+
+    interface M {
+        name: string | undefined,
+        userId: number | undefined
+    };
 
     const submitChirp = async () => {
-        if(user === null || user === "null") {
+        if (user === null || user === "null") {
             setModalDisplay(true);
             setModalMessage("Please select a User.");
-        } else if(msg === "" || msg === " "){
+        } else if (msg === "" || msg === " ") {
             setModalDisplay(true);
             setModalMessage("Please enter a Chirp.");
-        } else if(location === "" || location === " ") {
+        } else if (location === "" || location === " ") {
             setModalDisplay(true);
             setModalMessage("Please enter a Location.");
         } else {
-            let finalSubmit: Chirp = {
-                userid: Number(user),
-                content: msg,
-                location
-            };
-            let myMethod = {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8'
-                },
-                body: JSON.stringify(finalSubmit)
-            }
-            let r: Response = await fetch("/api/chirps/new", myMethod);
-            setModalDisplay(true);
-            setModalBtns({close: false, home: true});
-            setModalMessage("New Chirp Posted!");
+            mentions(msg);
         }
     }
+
+    const sendPost = async () => {
+        let finalSubmit: Chirp = {
+            userid: Number(user),
+            content: msg,
+            location,
+            mention: mention
+        };
+        let myMethod = {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            },
+            body: JSON.stringify(finalSubmit)
+        }
+        let r: Response = await fetch("/api/chirps/new", myMethod);
+        //setModalDisplay(true);
+        //setModalBtns({close: false, home: true});
+        //setModalMessage("New Chirp Posted!");
+    }
+    
+    const mentions = (msgContent: string) => {
+        let mentionCheck = msgContent.split("@");
+        if (mentionCheck.length > 1) {
+            let nameToFindwTail = mentionCheck[1].split(" ");
+            let nameToFind = nameToFindwTail[0];
+
+            let success = false;
+            for (let i = 0; i < allUsers.length; i++) {
+                if (nameToFind === allUsers[i].name) {
+                    success = true;
+                    mention.userId = i + 1; // Zero and One discrepancy for Array and DB id --
+                    mention.name = nameToFind;
+                }
+            }
+            if (success) {
+                console.log("You Mentioned @" + nameToFind);
+            } else {
+                console.log("No Matches found for @" + nameToFind);
+            }
+        }
+        sendPost();
+    };
 
     const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setUser(e.target.value);
@@ -83,12 +121,13 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
                     <div className="card full-width shadow m-2 p-3">
                         <label className="sr-only">User:</label>
                         <select id="user-select" onChange={handleUserChange} className="m-3">
-                        <option value="null">- Select User -</option>
+                            <option value="null">- Select User -</option>
                             {allUsers?.map(x => (
                                 <option key={x.id} value={x.id}>{x.name}</option>
                             ))}
                         </select>
                         <label className="sr-only">Chirp:</label><textarea placeholder="Chirp" onChange={handleMsgChange}></textarea>
+                        <small>@mentions are case-sensitive and limited to one per Chirp.</small>
                         <label className="sr-only">Location:</label>
                         <div className="m-3">Chirping From: <input type="text" value={location} onChange={handleLocationChange}></input></div>
                         <div className="d-flex full-width justify-content-between p-3">

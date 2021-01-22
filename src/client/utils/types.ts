@@ -4,7 +4,8 @@ export interface Chirp {
     name?: string,
     content: string,
     location?: string,
-    _created?: string
+    _created?: string,
+    mention?: Object
 };
 
 export interface MB {
