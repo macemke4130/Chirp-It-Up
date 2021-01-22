@@ -59,7 +59,7 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
         //setModalBtns({close: false, home: true});
         //setModalMessage("New Chirp Posted!");
     }
-    
+
     const mentions = (msgContent: string) => {
         let mentionCheck = msgContent.split("@");
         if (mentionCheck.length > 1) {
@@ -77,7 +77,9 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
             if (success) {
                 console.log("You Mentioned @" + nameToFind);
             } else {
-                console.log("No Matches found for @" + nameToFind);
+                setModalDisplay(true);
+                setModalBtns({close: false, home: true, destroy: false});
+                setModalMessage("No users found with name @" + nameToFind + ". Chirp Posted Anyway!");
             }
         }
         sendPost();

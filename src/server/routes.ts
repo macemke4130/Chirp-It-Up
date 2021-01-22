@@ -59,13 +59,20 @@ router.post('/api/chirps/new', async (req, res) => {
         let mention = req.body.mention;
         let result: any = await db.chirps.newPost(userid, content, location);
         res.json(result);
-        
+
         // Mentions logic --
         let newId = result.insertId;
-        if(mention.name === undefined) {
-            console.log("No matching Mentions.");
+        if (mention.name === undefined) {
+            console.log("No Valid Mentions.");
         } else {
-            console.log(`Chirp Number ${newId} mentions ${mention.name}, who has a userId of ${mention.userId}.`);
+            try {
+                console.log(`Chirp Number ${newId} mentions ${mention.name}, who has a userId of ${mention.userId}.`);
+                let insertMention: any = await db.chirps.mention(mention.userId, newId);
+                res.json(insertMention);
+            } catch (e) {
+                console.log(e);
+                res.sendStatus(500);
+            }
         }
     } catch (e) {
         console.log(e);

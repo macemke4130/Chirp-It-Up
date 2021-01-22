@@ -7,6 +7,7 @@ const newPost = async (userid: number, content: string, location: string) => Que
 const users = async () => Query("Select id, name from users");
 const destroy = async (id: number) => Query(`Delete from Chirps Where ID = ${id}`);
 const put = async (id: number, userid: number, content: string, location: string) => Query(`update chirps set content = "${content}", userid = ${userid}, location = "${location}" where id = ${id}`);
+const mention = async (userId: number, chirpId: number) => Query(`insert into mentions (userid, chirpid) values (${userId}, ${chirpId})`);
 
 export default {
     all,
@@ -15,5 +16,6 @@ export default {
     newPost,
     users,
     destroy,
-    put
+    put,
+    mention
 };
