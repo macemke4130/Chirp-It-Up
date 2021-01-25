@@ -6,9 +6,7 @@ export interface ModalProps {
     display: boolean,
     displayFunction?: VoidFunction,
     destroyFunction?: VoidFunction,
-    btns?: MB,
-    user?: string,
-    msg?: string
+    btns?: MB
 };
 
 const Modal: React.FC<ModalProps> = (props) => {

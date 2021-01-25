@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from 'react-router-dom';
 import Modal from "./Modal";
 import { Chirp, MB } from "./utils/types";
@@ -20,12 +20,18 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
         userId: undefined
     };
 
-    interface M {
+    interface M { // M is for Mention --
         name: string | undefined,
         userId: number | undefined
     };
 
-    const submitChirp = async () => {
+    interface R { // R is for Record --
+        userId: number,
+        chirpId: number
+    };
+
+    const formatCheck = async () => {
+        // Determines if a Chirp is formatted correctly for the Database -- 
         if (user === null || user === "null") {
             setModalDisplay(true);
             setModalMessage("Please select a User.");
@@ -40,12 +46,42 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
         }
     }
 
-    const sendPost = async () => {
+    const mentions = (msgContent: string) => {
+        // Determines if a @User is mentioned in the body of the Chirp --
+        let mentionCheck = msgContent.split("@");
+        if (mentionCheck.length > 1) { // mentionCheck is an array with the @user in position 1 --
+            let nameToFindwTail = mentionCheck[1].split(" ");
+            let nameToFind = nameToFindwTail[0]; // Isolates the User in a string --
+
+            let success = false;
+            // Determines if the nameToFind variable is in the Users State array --
+            for (let i = 0; i < allUsers.length; i++) {
+                if (nameToFind === allUsers[i].name) {
+                    success = true;
+                    mention.userId = i + 1; // Zero and One discrepancy for Array and DB id --
+                    mention.name = nameToFind;
+                }
+            }
+            if (success) {
+                setModalDisplay(true);
+                setModalBtns({ close: false, home: true, destroy: false });
+                setModalMessage("You mentioned @" + nameToFind + " in your Chirp!");
+            } else {
+                setModalDisplay(true);
+                setModalBtns({ close: false, home: true, destroy: false });
+                setModalMessage("No users found with name @" + nameToFind + ". Chirp Posted Anyway!");
+            }
+            sendPost(true); // Boolean handles if the default Modal will be called. I know this is a hack --
+        } else {
+            sendPost(false)
+        }
+    };
+
+    const sendPost = async (hasMention: Boolean) => { 
         let finalSubmit: Chirp = {
             userid: Number(user),
             content: msg,
             location,
-            mention: mention
         };
         let myMethod = {
             method: 'POST',
@@ -55,35 +91,31 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
             body: JSON.stringify(finalSubmit)
         }
         let r: Response = await fetch("/api/chirps/new", myMethod);
-        //setModalDisplay(true);
-        //setModalBtns({close: false, home: true});
-        //setModalMessage("New Chirp Posted!");
-    }
+        let newId = await r.json();
+        let insertId = newId.insertId; // Grabs the insertedId number for possible Mentions Table insert --
 
-    const mentions = (msgContent: string) => {
-        let mentionCheck = msgContent.split("@");
-        if (mentionCheck.length > 1) {
-            let nameToFindwTail = mentionCheck[1].split(" ");
-            let nameToFind = nameToFindwTail[0];
-
-            let success = false;
-            for (let i = 0; i < allUsers.length; i++) {
-                if (nameToFind === allUsers[i].name) {
-                    success = true;
-                    mention.userId = i + 1; // Zero and One discrepancy for Array and DB id --
-                    mention.name = nameToFind;
-                }
+        // Mentions Logic --
+        if (mention.userId != undefined) {
+            let mentionRecord: R = {
+                userId: Number(user),
+                chirpId: Number(insertId)
+            };
+            let myMethod = {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8'
+                },
+                body: JSON.stringify(mentionRecord)
             }
-            if (success) {
-                console.log("You Mentioned @" + nameToFind);
-            } else {
-                setModalDisplay(true);
-                setModalBtns({close: false, home: true, destroy: false});
-                setModalMessage("No users found with name @" + nameToFind + ". Chirp Posted Anyway!");
-            }
+            let r: Response = await fetch("/api/chirps/mention", myMethod)
         }
-        sendPost();
-    };
+        if (hasMention === false) {
+            // If no mentions are found, valid or otherwise, display this --
+            setModalDisplay(true);
+            setModalBtns({ close: false, home: true });
+            setModalMessage("New Chirp Posted!");
+        }
+    }
 
     const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setUser(e.target.value);
@@ -97,19 +129,15 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
         setLocation(e.target.value);
     }
 
+    const closeModal = () => {
+        setModalDisplay(false);
+    }
+
     const getUsers = async () => {
         let r = await fetch("/api/users/");
         let allUsersJson = await r.json();
         setAllUsers(allUsersJson);
     };
-
-    const closeModal = () => {
-        setModalDisplay(false);
-    }
-
-    const showState = () => {
-        console.log(user, msg, location);
-    }
 
     useEffect(() => {
         getUsers();
@@ -134,7 +162,7 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
                         <div className="m-3">Chirping From: <input type="text" value={location} onChange={handleLocationChange}></input></div>
                         <div className="d-flex full-width justify-content-between p-3">
                             <Link to={"/"} className="btn btn-info btn-sm">Cancel</Link>
-                            <button className="btn btn-primary btn-sm" onClick={submitChirp}>Submit Chirp</button>
+                            <button className="btn btn-primary btn-sm" onClick={formatCheck}>Submit Chirp</button>
                         </div>
                     </div>
                 </div>

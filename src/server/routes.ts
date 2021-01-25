@@ -56,24 +56,19 @@ router.post('/api/chirps/new', async (req, res) => {
         let userid = req.body.userid;
         let content = req.body.content;
         let location = req.body.location;
-        let mention = req.body.mention;
-        let result: any = await db.chirps.newPost(userid, content, location);
-        res.json(result);
+        let toMySQL: any = await db.chirps.newPost(userid, content, location);
+        res.json(toMySQL);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
 
-        // Mentions logic --
-        let newId = result.insertId;
-        if (mention.name === undefined) {
-            console.log("No Valid Mentions.");
-        } else {
-            try {
-                console.log(`Chirp Number ${newId} mentions ${mention.name}, who has a userId of ${mention.userId}.`);
-                let insertMention: any = await db.chirps.mention(mention.userId, newId);
-                res.json(insertMention);
-            } catch (e) {
-                console.log(e);
-                res.sendStatus(500);
-            }
-        }
+router.post('/api/chirps/mention', async (req, res) => {
+    try {
+        let mention = req.body;
+        let insertMention: any = await db.chirps.mention(mention.userId, mention.chirpId);
+        res.json(insertMention);
     } catch (e) {
         console.log(e);
         res.sendStatus(500);
