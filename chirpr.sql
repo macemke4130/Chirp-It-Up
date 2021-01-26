@@ -5,6 +5,7 @@ use chirpr;
 create user 'chirprapp'@'localhost' identified by 'root';
 GRANT ALL ON chirpr.* TO 'chirprapp'@'localhost';
 
+drop table users;
 create table users (
 id int not null auto_increment primary key,
 name varchar(100) not null,
@@ -50,7 +51,6 @@ insert into users (name, email, password)
 values("Danger", "ilikedanger@gmail.com", "password1");
 
 select * from chirps;
-
 insert into chirps (userid, content, location) values
 (5, "My New Favorite Number is 346", "Milwaukee"),
 (4, "My New Favorite Number is 258", "Austin"),
@@ -155,11 +155,6 @@ insert into chirps (userid, content, location) values
 ;
 
 select * from chirps;
-update chirps set content = "Test Test", userid = 2 where id = 2;
-select * from chirps where (id) = 2;
-
-delete from chirps
-where userid = 2;
 
 drop table mentions;
 create table mentions(
@@ -181,16 +176,21 @@ references chirps(id)
 ;
 
 select * from mentions;
-
-insert into mentions (userid, chirpid) values
-(1, 5),
-(6, 10),
-(3, 40),
-(9, 98),
-(2, 8)
-;
+delete from mentions where userid > 0;
 
 # Joins the Chirps table record with the corresponding User in the User table --
 select chirps.id, name, content, location, chirps._created from chirps inner join users on chirps.userid = users.id order by chirps.id;
 
-Select * from users;
+drop procedure spUserMentions;
+delimiter //
+create procedure spUserMentions (in x int)
+begin
+	select users.id as chirpAuthorId, users.name as chirpAuthorName, chirps.id as chirpid, chirps.content, chirps.location, chirps._created from mentions
+	join chirps on chirps.id = mentions.chirpid
+    join users on users.id = chirps.userid
+    where mentions.userid = x
+    order by chirps._created desc;
+end //
+delimiter ;
+
+call spUserMentions(1);
