@@ -21,11 +21,10 @@ const AllChirps: React.FC<AllChirpsProps> = (props) => {
     <>
       <div className="container d-flex flex-column align-items-center">
         <Link to={"/new"} className="btn btn-primary btn-lg">New Chirp</Link>
-        <Link to={"/mentions"} className="btn btn-primary btn-lg">All Mentions</Link>
         {chirps?.reverse().map(chirp => (
           <div key={"chirp-" + chirp.id} className="col-6">
             <div className="card shadow m-2 p-3">
-              <h3>@{chirp.name}</h3>
+              <h3><Link to={"/mentions/" + chirp.userid}>@{chirp.name}</Link></h3>
               <p>{chirp.content}</p>
               <div className="d-flex justify-content-between align-items-center">
                 <small>{chirp.location}</small>

@@ -8,6 +8,15 @@ export interface Chirp {
     mention?: Object
 };
 
+export interface MentionChirp {
+    chirpAuthorId: number,
+    chirpAuthorName: string,
+    chirpid: number,
+    content: string,
+    location: string,
+    _created: string
+};
+
 export interface MB {
     close: boolean,
     home: boolean,

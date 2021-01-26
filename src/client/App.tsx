@@ -16,7 +16,7 @@ const App: React.FC<AppProps> = (props) => {
 			<Switch>
 				<Route exact path="/" component={AllChirps} />
 				<Route exact path="/new/" component={NewChirp} />
-				<Route exact path="/mentions/" component={AllMentions} />
+				<Route path="/mentions/:id" component={AllMentions} />
 				<Route path="/admin/:id" component={Admin} />
 				<Route path="/:id" component={SingleChirp} />
 			</Switch>

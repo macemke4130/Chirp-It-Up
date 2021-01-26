@@ -101,7 +101,7 @@ const Admin: React.FC<AdminProps> = (props) => {
                         </select>
                         <div className="p-2"></div>
                         <label>Chirp</label><textarea value={msg} onChange={handleMsgChange} ></textarea>
-                        <small>@mentions logic has no functionality here. Can not delete Chirps with @mentions.</small>
+                        <small>@mentions logic has no functionality here. Can not delete Chirps with @mentions. Fight me.</small>
                         <label className="sr-only">Location:</label>
                         <div className="m-3">Chirping From: <input type="text" value={location} onChange={handleLocationChange}></input></div>
                         <div className="d-flex full-width justify-content-between p-3">

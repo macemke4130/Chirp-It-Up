@@ -64,6 +64,17 @@ router.post('/api/chirps/new', async (req, res) => {
     }
 });
 
+router.get('/api/chirps/mentions/:id', async (req, res) => {
+    let id: number = Number(req.params.id);
+    try {
+        let toMySQL: any = await db.chirps.allMentions(id);
+        res.json(toMySQL);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
 router.post('/api/chirps/mention', async (req, res) => {
     try {
         let mention = req.body;

@@ -10,7 +10,7 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
     const [allUsers, setAllUsers] = useState<Array<any>>([]);
     const [user, setUser] = useState<string | null>(null);
     const [msg, setMsg] = useState<string>("");
-    const [location, setLocation] = useState<string>("Testing");
+    const [location, setLocation] = useState<string>("");
     const [modalDisplay, setModalDisplay] = useState<boolean>(false);
     const [modalMessage, setModalMessage] = useState<string>("");
     const [modalBtns, setModalBtns] = useState<MB>({ close: true, home: false });
@@ -97,7 +97,7 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
         // Mentions Logic --
         if (mention.userId != undefined) {
             let mentionRecord: R = {
-                userId: Number(user),
+                userId: Number(mention.userId),
                 chirpId: Number(insertId)
             };
             let myMethod = {
@@ -107,12 +107,12 @@ const NewChirp: React.FC<NewChirpProps> = (props) => {
                 },
                 body: JSON.stringify(mentionRecord)
             }
-            let r: Response = await fetch("/api/chirps/mention", myMethod)
+            let r: Response = await fetch("/api/chirps/mention/", myMethod)
         }
         if (hasMention === false) {
             // If no mentions are found, valid or otherwise, display this --
             setModalDisplay(true);
-            setModalBtns({ close: false, home: true });
+            setModalBtns({ close: false, home: true, destroy: false });
             setModalMessage("New Chirp Posted!");
         }
     }
